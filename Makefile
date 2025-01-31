@@ -3,4 +3,4 @@ build:
 	ENV=prod go build -o bin/encurtago cmd/api/main.go
 
 dev:
-	cd client && pnpm dev & air && fg
+	npx concurrently -k -c "#93c5fd,#c4b5fd" "cd client && pnpm dev" "air" --names=vite,api

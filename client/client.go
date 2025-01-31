@@ -8,13 +8,10 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-
-	_ "github.com/joho/godotenv/autoload"
 )
 
 var (
@@ -37,6 +34,9 @@ func findActiveViteServer() (*url.URL, error) {
 		Timeout: 100 * time.Millisecond,
 	}
 
+	// Wait for the Vite dev server to start
+	time.Sleep(1 * time.Second)
+
 	for _, port := range vitePorts {
 
 		targetURL := fmt.Sprintf("http://localhost:%d", port)
@@ -56,8 +56,8 @@ func findActiveViteServer() (*url.URL, error) {
 	return nil, fmt.Errorf("no active Vite dev server found on ports %v", vitePorts)
 }
 
-func RegisterHandlers(r *gin.Engine) {
-	if os.Getenv("ENV") == "dev" {
+func RegisterHandlers(r *gin.Engine, env string) {
+	if env == "dev" {
 
 		log.Println("Running in dev mode")
 
