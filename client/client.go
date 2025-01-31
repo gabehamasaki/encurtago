@@ -4,10 +4,12 @@ import (
 	"embed"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"path"
 	"strings"
 	"time"
 
@@ -58,63 +60,81 @@ func findActiveViteServer() (*url.URL, error) {
 
 func RegisterHandlers(r *gin.Engine, env string) {
 	if env == "dev" {
-
 		log.Println("Running in dev mode")
-
 		setupDevProxy(r)
-
 		return
 
 	}
 
-	// Create file systems for static files and index.html
-	distFS := http.FS(dist)
-	indexFS := http.FS(indexHTML)
+	log.Println("Running in prod mode")
+	// Strip the "dist" prefix from the embedded filesystem
 
-	// Serve static files
+	distFS, err := fs.Sub(dist, "dist")
+	if err != nil {
+		log.Fatalf("Failed to create sub-filesystem: %v", err)
+	}
 
-	r.StaticFS("/", distFS)
+	// Serve index.html for the root path and handle SPA routes
 
-	// Serve index.html for the root path
-
-	r.GET("/", func(c *gin.Context) {
-		file, err := indexFS.Open("dist/index.html")
+	serveIndexHTML := func(c *gin.Context) {
+		indexFile, err := distFS.Open("index.html")
 		if err != nil {
-
 			c.Status(http.StatusInternalServerError)
-
 			return
-
 		}
+		defer indexFile.Close()
 
-		defer file.Close()
+		http.ServeContent(c.Writer, c.Request, "index.html", time.Now(), indexFile.(io.ReadSeeker))
+	}
 
-		http.ServeContent(c.Writer, c.Request, "index.html", time.Now(), file.(io.ReadSeeker))
-	})
-
-	// Handle SPA routes - serve index.html for non-API routes and redirects routes
+	// Handle all routes
 
 	r.NoRoute(func(c *gin.Context) {
-		// Skip API routes
+		// Try to serve static files
 
-		if strings.HasPrefix(c.Request.URL.Path, "/api") || strings.HasPrefix(c.Request.URL.Path, "/r") {
-			c.Next()
+		filePath := strings.TrimPrefix(c.Request.URL.Path, "/")
 
-			return
-
+		if filePath == "" {
+			filePath = "index.html"
 		}
 
-		file, err := indexFS.Open("dist/index.html")
+		file, err := distFS.Open(filePath)
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
-
+			// If the file doesn't exist, it might be a frontend route
+			if strings.HasPrefix(c.Request.URL.Path, "/api") || strings.HasPrefix(c.Request.URL.Path, "/r") {
+				// For API or redirect routes, let Gin handle it
+				c.Next()
+			} else {
+				// For frontend routes, serve index.html
+				serveIndexHTML(c)
+			}
 			return
-
 		}
-
 		defer file.Close()
 
-		http.ServeContent(c.Writer, c.Request, "index.html", time.Now(), file.(io.ReadSeeker))
+		stat, err := file.Stat()
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			return
+		}
+
+		if stat.IsDir() {
+			// If it's a directory, try to serve index.html from that directory
+			indexPath := path.Join(filePath, "index.html")
+
+			indexFile, err := distFS.Open(indexPath)
+			if err != nil {
+				serveIndexHTML(c)
+				return
+			}
+
+			defer indexFile.Close()
+
+			http.ServeContent(c.Writer, c.Request, "index.html", stat.ModTime(), indexFile.(io.ReadSeeker))
+
+		} else {
+			http.ServeContent(c.Writer, c.Request, stat.Name(), stat.ModTime(), file.(io.ReadSeeker))
+		}
 	})
 }
 
