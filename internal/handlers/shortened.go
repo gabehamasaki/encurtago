@@ -10,5 +10,11 @@ func (h *Handler) Redirect(ctx *gin.Context) {
 		return
 	}
 
+	err = h.cfg.DB.UpdateClickCount(ctx, url.ShortUrl)
+	if err != nil {
+		ctx.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
 	ctx.Redirect(301, url.Url)
 }

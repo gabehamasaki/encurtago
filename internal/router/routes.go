@@ -16,5 +16,5 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
 		api.POST("/urls", handler.CreateShortURL)
 	}
 
-	api.GET("/r/:shortened", handler.Redirect)
+	r.GET("/r/:shortened", handler.Redirect)
 }

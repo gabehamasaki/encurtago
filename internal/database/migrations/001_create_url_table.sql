@@ -3,8 +3,9 @@ CREATE TABLE IF NOT EXISTS urls (
     "id" uuid PRIMARY KEY NOT NULL DEFAULT  gen_random_uuid(),
     "url" VARCHAR(255) NOT NULL,
     "short_url" VARCHAR(32) NOT NULL,
-    "created_at" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "expired_at" TIMESTAMP
+    "click_count" INT DEFAULT 0,
+    "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "expired_at" TIMESTAMPTZ NOT NULL
 );
 
 ---- create above / drop below ----

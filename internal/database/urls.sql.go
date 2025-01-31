@@ -7,18 +7,19 @@ package database
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
+	"time"
 )
 
 const createUrl = `-- name: CreateUrl :one
-  INSERT INTO urls (url, short_url, expired_at) VALUES ($1, $2, $3) RETURNING id, url, short_url, created_at, expired_at
+  INSERT INTO urls (url, short_url, expired_at) 
+  VALUES ($1, $2, $3) 
+  RETURNING id, url, short_url, created_at, expired_at, click_count
 `
 
 type CreateUrlParams struct {
 	Url       string
 	ShortUrl  string
-	ExpiredAt pgtype.Timestamp
+	ExpiredAt time.Time
 }
 
 func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (Url, error) {
@@ -30,12 +31,13 @@ func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (Url, erro
 		&i.ShortUrl,
 		&i.CreatedAt,
 		&i.ExpiredAt,
+		&i.ClickCount,
 	)
 	return i, err
 }
 
 const deleteUrlByShortUrl = `-- name: DeleteUrlByShortUrl :one
-  DELETE FROM urls WHERE short_url = $1 RETURNING id, url, short_url, created_at, expired_at
+  DELETE FROM urls WHERE short_url = $1 RETURNING id, url, short_url, created_at, expired_at, click_count
 `
 
 func (q *Queries) DeleteUrlByShortUrl(ctx context.Context, shortUrl string) (Url, error) {
@@ -47,12 +49,13 @@ func (q *Queries) DeleteUrlByShortUrl(ctx context.Context, shortUrl string) (Url
 		&i.ShortUrl,
 		&i.CreatedAt,
 		&i.ExpiredAt,
+		&i.ClickCount,
 	)
 	return i, err
 }
 
 const getUrlByShortUrl = `-- name: GetUrlByShortUrl :one
-  SELECT id, url, short_url, created_at, expired_at FROM urls WHERE short_url = $1
+  SELECT id, url, short_url, created_at, expired_at, click_count FROM urls WHERE short_url = $1
 `
 
 func (q *Queries) GetUrlByShortUrl(ctx context.Context, shortUrl string) (Url, error) {
@@ -64,12 +67,13 @@ func (q *Queries) GetUrlByShortUrl(ctx context.Context, shortUrl string) (Url, e
 		&i.ShortUrl,
 		&i.CreatedAt,
 		&i.ExpiredAt,
+		&i.ClickCount,
 	)
 	return i, err
 }
 
 const listUrls = `-- name: ListUrls :many
-  SELECT id, url, short_url, created_at, expired_at FROM urls
+  SELECT id, url, short_url, created_at, expired_at, click_count FROM urls
 `
 
 func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
@@ -87,6 +91,7 @@ func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
 			&i.ShortUrl,
 			&i.CreatedAt,
 			&i.ExpiredAt,
+			&i.ClickCount,
 		); err != nil {
 			return nil, err
 		}
@@ -96,4 +101,13 @@ func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateClickCount = `-- name: UpdateClickCount :exec
+  UPDATE urls SET click_count = click_count + 1 WHERE short_url = $1
+`
+
+func (q *Queries) UpdateClickCount(ctx context.Context, shortUrl string) error {
+	_, err := q.db.Exec(ctx, updateClickCount, shortUrl)
+	return err
 }

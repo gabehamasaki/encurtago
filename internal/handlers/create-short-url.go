@@ -10,7 +10,6 @@ import (
 	"github.com/gabehamasaki/encurtago/internal/database"
 	"github.com/gabehamasaki/encurtago/internal/dtos"
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func (h *Handler) CreateShortURL(ctx *gin.Context) {
@@ -20,14 +19,12 @@ func (h *Handler) CreateShortURL(ctx *gin.Context) {
 		return
 	}
 
-	expiredAt := time.Now().Add(time.Hour * 24 * 7)
+	expiredAt := time.Now().Add(7 * 24 * time.Hour) // Adds 7 days
 
 	url, err := h.cfg.DB.CreateUrl(ctx, database.CreateUrlParams{
-		Url:      req.Original,
-		ShortUrl: makeShortUrl(req.Original),
-		ExpiredAt: pgtype.Timestamp{
-			Time: expiredAt,
-		},
+		Url:       req.Original,
+		ShortUrl:  makeShortUrl(req.Original),
+		ExpiredAt: expiredAt,
 	})
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})

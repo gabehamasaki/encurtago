@@ -5,14 +5,17 @@
 package database
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Url struct {
-	ID        uuid.UUID
-	Url       string
-	ShortUrl  string
-	CreatedAt pgtype.Timestamp
-	ExpiredAt pgtype.Timestamp
+	ID         uuid.UUID
+	Url        string
+	ShortUrl   string
+	CreatedAt  pgtype.Timestamptz
+	ExpiredAt  time.Time
+	ClickCount pgtype.Int4
 }
