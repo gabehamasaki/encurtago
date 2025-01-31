@@ -1,0 +1,16 @@
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-encurtago}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-encurtago}
+      POSTGRES_DB: ${DB_NAME:-encurtago}
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+networks:
+  postgres:
+    driver: bridge

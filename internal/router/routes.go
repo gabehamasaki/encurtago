@@ -12,5 +12,9 @@ func RegisterRoutes(r *gin.Engine, cfg *config.Config) {
 	api := r.Group("/api")
 	{
 		api.GET("/ping", handler.Ping)
+		api.GET("/urls", handler.ListAllURLs)
+		api.POST("/urls", handler.CreateShortURL)
 	}
+
+	api.GET("/r/:shortened", handler.Redirect)
 }
