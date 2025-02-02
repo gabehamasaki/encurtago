@@ -1,7 +1,11 @@
+import logo from "./assets/logo.svg";
+import { Button } from "./components/ui/button";
+
 function App() {
   return (
-    <main className="w-screen h-screen bg-emerald-300">
-      <h1>Hello World</h1>
+    <main className="">
+      <img src={logo} className="w-80" />
+      <Button>Click Here</Button>
     </main>
   );
 }
