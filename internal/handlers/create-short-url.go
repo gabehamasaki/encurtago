@@ -32,7 +32,7 @@ func (h *Handler) CreateShortURL(ctx *gin.Context) {
 	}
 	var res dtos.CreateShortURLResponse
 	res.ToDTO(&url)
-	ctx.JSON(200, gin.H{"url": res})
+	ctx.JSON(200, res)
 }
 
 const base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
