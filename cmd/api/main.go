@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/gabehamasaki/encurtago/client"
 	"github.com/gabehamasaki/encurtago/internal/config"
@@ -29,5 +28,5 @@ func main() {
 	client.RegisterHandlers(r, cfg.ENV)
 	router.RegisterRoutes(r, cfg)
 
-	r.Run(fmt.Sprintf(":%s", cfg.PORT))
+	r.Run(":8080")
 }

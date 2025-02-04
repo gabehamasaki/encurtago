@@ -9,7 +9,6 @@ import (
 
 type Config struct {
 	ENV         string
-	PORT        string
 	DB_NAME     string
 	DB_USER     string
 	DB_PASSWORD string
@@ -20,7 +19,6 @@ type Config struct {
 func NewConfig() *Config {
 	return &Config{
 		ENV:         os.Getenv("ENV"),
-		PORT:        os.Getenv("PORT"),
 		DB_NAME:     os.Getenv("DB_NAME"),
 		DB_USER:     os.Getenv("DB_USER"),
 		DB_PASSWORD: os.Getenv("DB_PASSWORD"),
