@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.svg";
 import {
   Table,
   TableBody,
@@ -89,10 +90,9 @@ export default function App() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex justify-center mb-12">
-        <h1 className="text-4xl font-bold">
-          EN<span className="text-[#00BCD4]">CURTA</span>
-          <span className="text-[#00BCD4]">GO</span>
-        </h1>
+        <a href="/">
+          <img src={logo} alt="EncurtaGO" className="w-96" />
+        </a>
       </div>
 
       <div className="space-y-8">
@@ -141,7 +141,9 @@ export default function App() {
                   shortenedUrls.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell className="font-medium">
-                        {item.shortened}
+                        <a href={`${item.shortened}`} target="_blank">
+                          {item.shortened}
+                        </a>
                       </TableCell>
                       <TableCell>{item.original}</TableCell>
                       <TableCell>{item.created_at}</TableCell>
