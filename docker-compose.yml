@@ -1,6 +1,20 @@
 services:
-  postgres:
-    container_name: postgres_container
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      ENV: ${ENV:-prod}
+      DB_HOST: ${DB_HOST:-db}
+      DB_NAME: ${DB_NAME:-encurtago}
+      DB_USER: ${DB_USER:-encurtago}
+      DB_PASSWORD: ${DB_PASSWORD-encurtago}
+    ports:
+      - "8080:8080"
+    networks:
+      - postgres
+    restart: unless-stopped
+  db:
     image: postgres
     environment:
       POSTGRES_USER: ${DB_USER:-encurtago}
