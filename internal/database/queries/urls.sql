@@ -1,5 +1,5 @@
 -- name: ListUrls :many
-  SELECT * FROM urls;
+  SELECT * FROM urls order by created_at desc limit 10;
 
 -- name: GetUrlByShortUrl :one
   SELECT * FROM urls WHERE short_url = $1;

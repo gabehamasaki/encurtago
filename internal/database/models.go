@@ -15,7 +15,7 @@ type Url struct {
 	ID         uuid.UUID
 	Url        string
 	ShortUrl   string
+	ClickCount pgtype.Int4
 	CreatedAt  pgtype.Timestamptz
 	ExpiredAt  time.Time
-	ClickCount pgtype.Int4
 }

@@ -13,7 +13,7 @@ import (
 const createUrl = `-- name: CreateUrl :one
   INSERT INTO urls (url, short_url, expired_at) 
   VALUES ($1, $2, $3) 
-  RETURNING id, url, short_url, created_at, expired_at, click_count
+  RETURNING id, url, short_url, click_count, created_at, expired_at
 `
 
 type CreateUrlParams struct {
@@ -29,15 +29,15 @@ func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (Url, erro
 		&i.ID,
 		&i.Url,
 		&i.ShortUrl,
+		&i.ClickCount,
 		&i.CreatedAt,
 		&i.ExpiredAt,
-		&i.ClickCount,
 	)
 	return i, err
 }
 
 const deleteUrlByShortUrl = `-- name: DeleteUrlByShortUrl :one
-  DELETE FROM urls WHERE short_url = $1 RETURNING id, url, short_url, created_at, expired_at, click_count
+  DELETE FROM urls WHERE short_url = $1 RETURNING id, url, short_url, click_count, created_at, expired_at
 `
 
 func (q *Queries) DeleteUrlByShortUrl(ctx context.Context, shortUrl string) (Url, error) {
@@ -47,15 +47,15 @@ func (q *Queries) DeleteUrlByShortUrl(ctx context.Context, shortUrl string) (Url
 		&i.ID,
 		&i.Url,
 		&i.ShortUrl,
+		&i.ClickCount,
 		&i.CreatedAt,
 		&i.ExpiredAt,
-		&i.ClickCount,
 	)
 	return i, err
 }
 
 const getUrlByShortUrl = `-- name: GetUrlByShortUrl :one
-  SELECT id, url, short_url, created_at, expired_at, click_count FROM urls WHERE short_url = $1
+  SELECT id, url, short_url, click_count, created_at, expired_at FROM urls WHERE short_url = $1
 `
 
 func (q *Queries) GetUrlByShortUrl(ctx context.Context, shortUrl string) (Url, error) {
@@ -65,15 +65,15 @@ func (q *Queries) GetUrlByShortUrl(ctx context.Context, shortUrl string) (Url, e
 		&i.ID,
 		&i.Url,
 		&i.ShortUrl,
+		&i.ClickCount,
 		&i.CreatedAt,
 		&i.ExpiredAt,
-		&i.ClickCount,
 	)
 	return i, err
 }
 
 const listUrls = `-- name: ListUrls :many
-  SELECT id, url, short_url, created_at, expired_at, click_count FROM urls
+  SELECT id, url, short_url, click_count, created_at, expired_at FROM urls order by created_at desc limit 10
 `
 
 func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
@@ -89,9 +89,9 @@ func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
 			&i.ID,
 			&i.Url,
 			&i.ShortUrl,
+			&i.ClickCount,
 			&i.CreatedAt,
 			&i.ExpiredAt,
-			&i.ClickCount,
 		); err != nil {
 			return nil, err
 		}

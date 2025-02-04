@@ -27,9 +27,11 @@ type CreateShortURLRequest struct {
 type CreateShortURLResponse struct {
 	Original  string `json:"original"`
 	Shortened string `json:"shortened"`
+	CreatedAt string `json:"created_at"`
 }
 
 func (r *CreateShortURLResponse) ToDTO(raw *database.Url) {
 	r.Original = raw.Url
 	r.Shortened = raw.ShortUrl
+	r.CreatedAt = raw.CreatedAt.Time.String()
 }
