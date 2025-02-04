@@ -117,11 +117,7 @@ export default function App() {
             </Button>
           </form>
           <div className="text-sm text-center text-gray-600">
-            {alert && (
-              <a href={alert.split(" ")[1]} target="_blank">
-                {alert}
-              </a>
-            )}
+            {alert && <span>{alert}</span>}
           </div>
         </div>
 
