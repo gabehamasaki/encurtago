@@ -24,7 +24,7 @@ export default function App() {
   const [alert, setAlert] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/urls")
+    fetch("/api/urls")
       .then((res) => res.json())
       .then((data) =>
         setShortenedUrls(
@@ -51,7 +51,7 @@ export default function App() {
     e.preventDefault();
     setLoading(true);
 
-    const res = await fetch("http://localhost:8080/api/urls", {
+    const res = await fetch("/api/urls", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function App() {
       ...shortenedUrls,
     ]);
 
-    setAlert("URL: http://localhost:8080/r/" + body.shortened);
+    setAlert("URl encurtada com sucesso!");
 
     setUrl("");
   };
